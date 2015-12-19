@@ -1,0 +1,62 @@
+
+plugins {
+  id 'java'
+  id 'eclipse'
+  id 'maven'
+}
+
+
+
+/*
+ * Gets the version name from the latest Git tag of the form V-X.Y where X and Y are version numbers
+ */
+def getVersionName = { ->
+  def stdout = new ByteArrayOutputStream()
+  exec {
+    commandLine 'git', 'describe', '--tags', '--match', 'V-*.*'
+    standardOutput = stdout
+  }
+  def v = stdout.toString().trim() =~ /V-(\d+)\.(\d+)(?:-(\d+)-)?/
+  return v[0][1] + "." + v[0][2] + "." + (v[0][3] == null ? 0 : v[0][3])
+}
+
+group = 'ch.kerbtier.pogotree'
+version = getVersionName()
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+
+dependencies {
+  compile 'com.orientechnologies:orientdb-core:2.1.7'
+  compile 'com.google.guava:guava:18.0'
+  compile 'commons-io:commons-io:2.4'
+  
+  testCompile 'com.h2database:h2:1.4.188'
+  testCompile 'junit:junit:4.12'
+}
+
+test {
+  exclude '**/util/*'
+  
+  testLogging {
+    exceptionFormat = 'full'
+    showStandardStreams = true
+  }
+}
+
+jar {
+  baseName = 'pogotree'
+  version =  version
+  manifest {
+    attributes 'Implementation-Title': 'pogotree', 'Implementation-Version': version
+  }
+}
+
+
+
