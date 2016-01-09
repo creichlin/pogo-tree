@@ -7,4 +7,4 @@ It's nor much different from a json file but supports transactions and scalabili
 
 There are no additional services like schema or validation.
 
-Uses [https://github.com/creichlin/hops-db] as a backend.
+Uses [hops-db](https://github.com/creichlin/hops-db) as a backend.
