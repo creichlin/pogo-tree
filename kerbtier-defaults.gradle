@@ -1,0 +1,33 @@
+//Last update: Sat Jan 09 16:42:17 CET 2016
+// kerbtier.ch defaults, do not change, will be overwritten
+
+/*
+ * Gets the version name from the latest Git tag of the form V-X.Y where X and Y are version numbers
+ */
+def getVersionName = { ->
+  def stdout = new ByteArrayOutputStream()
+  exec {
+    commandLine 'git', 'describe', '--tags', '--match', 'V-*.*'
+    standardOutput = stdout
+  }
+  def v = stdout.toString().trim() =~ /V-(\d+)\.(\d+)(?:-(\d+)-)?/
+  return v[0][1] + "." + v[0][2] + "." + (v[0][3] == null ? 0 : v[0][3])
+}
+
+version = getVersionName()
+
+jar {
+  manifest {
+    attributes 'Implementation-Title': project.name, 'Implementation-Version': version
+  }
+}
+
+
+task updateKerbtierDefaults {
+  def url = 'https://gist.githubusercontent.com/creichlin/125a4387c15038b1672a/raw/kerbtier-default.gradle'
+  def f = new File('kerbtier-defaults.gradle')
+  new URL(url).withInputStream { i -> f.withOutputStream {
+    it << "//Last update: " + new Date() + "\n" 
+    it << i
+  }}
+}

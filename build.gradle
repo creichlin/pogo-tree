@@ -1,27 +1,14 @@
 
 plugins {
+  id 'groovy'
   id 'java'
   id 'eclipse'
   id 'maven'
 }
 
+apply from: 'kerbtier-defaults.gradle'
 
-
-/*
- * Gets the version name from the latest Git tag of the form V-X.Y where X and Y are version numbers
- */
-def getVersionName = { ->
-  def stdout = new ByteArrayOutputStream()
-  exec {
-    commandLine 'git', 'describe', '--tags', '--match', 'V-*.*'
-    standardOutput = stdout
-  }
-  def v = stdout.toString().trim() =~ /V-(\d+)\.(\d+)(?:-(\d+)-)?/
-  return v[0][1] + "." + v[0][2] + "." + (v[0][3] == null ? 0 : v[0][3])
-}
-
-group = 'ch.kerbtier.pogotree'
-version = getVersionName()
+group = 'ch.kerbtier.pogo-tree'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -31,14 +18,15 @@ repositories {
   mavenCentral()
 }
 
-
 dependencies {
-  compile 'com.orientechnologies:orientdb-core:2.1.7'
   compile 'com.google.guava:guava:18.0'
   compile 'commons-io:commons-io:2.4'
+  compile 'ch.kerbtier.hops-db:hops-db:0.1.+'
   
-  testCompile 'com.h2database:h2:1.4.188'
+  testCompile 'com.h2database:h2:1.4.190'
   testCompile 'junit:junit:4.12'
+  testCompile 'com.mchange:c3p0:0.9.5.1'
+  testCompile 'org.codehaus.groovy:groovy-all:2.4.5'
 }
 
 test {
@@ -46,17 +34,6 @@ test {
   
   testLogging {
     exceptionFormat = 'full'
-    showStandardStreams = true
+    stackTraceFilters 'groovy'
   }
 }
-
-jar {
-  baseName = 'pogotree'
-  version =  version
-  manifest {
-    attributes 'Implementation-Title': 'pogotree', 'Implementation-Version': version
-  }
-}
-
-
-
