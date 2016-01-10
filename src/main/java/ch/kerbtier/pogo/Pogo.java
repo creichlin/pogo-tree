@@ -4,4 +4,6 @@ public interface Pogo extends PogoObject {
 
   PogoTransaction start();
   
+  String dumpSource();
+  
 }

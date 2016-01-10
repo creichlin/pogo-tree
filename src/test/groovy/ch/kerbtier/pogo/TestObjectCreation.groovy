@@ -18,6 +18,7 @@ public class TestObjectCreation extends H2Test {
     }
   }
 
+  @Test
   public void testDeleteObjectBySettingNull() {
     transaction {
       pogo["field"] = PogoObject.class
