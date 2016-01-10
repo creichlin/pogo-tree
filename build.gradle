@@ -8,19 +8,8 @@ plugins {
 
 apply from: 'kerbtier-defaults.gradle'
 
-group = 'ch.kerbtier.pogo-tree'
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
-repositories {
-  mavenLocal()
-  mavenCentral()
-}
 
 dependencies {
-  compile 'com.google.guava:guava:18.0'
-  compile 'commons-io:commons-io:2.4'
   compile 'ch.kerbtier.hops-db:hops-db:0.1.+'
   
   testCompile 'com.h2database:h2:1.4.190'
