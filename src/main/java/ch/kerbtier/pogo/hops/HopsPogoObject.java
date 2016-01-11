@@ -46,7 +46,7 @@ public class HopsPogoObject implements PogoObject {
       } else if (type == PogoType.INTEGER) {
         valueDao.setInteger((Integer) value);
       } else if (type == PogoType.NULL) {
-        // type is set already
+        // no value to set when null
       } else if (type == PogoType.OBJECT) {
         DaoObject newObject = new DaoObject();
         root.getDb().create(newObject);
