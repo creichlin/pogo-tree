@@ -118,14 +118,16 @@ public class HopsPogoObject implements PogoObject {
         PogoType type = PogoType.byId(value.getType());
         if (type.isPrimitive()) {
           root.getDb().delete(value);
+          
         } else if (type == PogoType.OBJECT) {
-          HopsPogoObject subObject = get("field", HopsPogoObject.class);
+          HopsPogoObject subObject = get(field, HopsPogoObject.class);
 
           for (String subField : subObject.getFields()) {
             subObject.delete(subField);
           }
           DaoObject object = root.getDb().select(DaoObject.class).byPk(value.getInteger()).first();
           root.getDb().delete(object);
+          root.getDb().delete(value);
         }
       } catch (NoMatchFound e) {
         // there is no value so we wont delete

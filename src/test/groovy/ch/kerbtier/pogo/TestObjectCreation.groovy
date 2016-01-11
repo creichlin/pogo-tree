@@ -35,4 +35,27 @@ public class TestObjectCreation extends H2Test {
       pogo["field"]
     }
   }
+
+  @Test(expected = NoSuchField.class)
+  public void testDeleteObjectWithField() {
+    transaction {
+      pogo["obj"] = PogoObject.class
+      pogo["obj"]["foo"] = "bar"
+      pogo["obj"].delete();
+      pogo["obj"]
+    }
+  }
+
+    @Test(expected = NoSuchField.class)
+  public void testDeleteObjectWithObjectFieldAndTransaction() {
+    transaction {
+      pogo["obj"] = PogoObject.class
+      pogo["obj"]["foo"] = PogoObject.class
+    }
+    
+    transaction {
+      pogo["obj"].delete();
+      pogo["obj"]
+    }
+  }
 }
