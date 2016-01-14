@@ -1,7 +1,7 @@
 package ch.kerbtier.pogo;
 
 public enum PogoType {
-  STRING(1, true), INTEGER(2, true), NULL(3, true), OBJECT(4, false);
+  STRING(1, true), INTEGER(2, true), NULL(3, true), OBJECT(4, false), LIST(5, false);
   
   private int id;
   private boolean primitive;
@@ -27,10 +27,16 @@ public enum PogoType {
     } else if(value instanceof Integer) {
       return INTEGER;
     } else if(value instanceof Class) {
-      return OBJECT;
+      Class classType = (Class)value;
+      
+      if(classType.isAssignableFrom(PogoObject.class)) {
+        return OBJECT;
+      } else if(classType.isAssignableFrom(PogoList.class)) {
+        return LIST;
+      }
     }
     
-    throw new RuntimeException("unknown type");
+    throw new RuntimeException("unknown type " + value);
   }
 
   public static PogoType byId(int id) {

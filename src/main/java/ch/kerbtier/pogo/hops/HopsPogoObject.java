@@ -10,6 +10,7 @@ import ch.kerbtier.pogo.PogoObject;
 import ch.kerbtier.pogo.PogoType;
 import ch.kerbtier.pogo.exceptions.NoSuchField;
 import ch.kerbtier.pogo.exceptions.PogoException;
+import ch.kerbtier.pogo.hops.dao.DaoList;
 import ch.kerbtier.pogo.hops.dao.DaoObject;
 import ch.kerbtier.pogo.hops.dao.DaoObjectValue;
 
@@ -36,27 +37,41 @@ public class HopsPogoObject implements PogoObject {
         valueDao = root.getDb().select(DaoObjectValue.class).where("parent = ? and name = ?", dao.getId(), field)
             .first();
       } catch (NoMatchFound e) {
+        // no value yet, create one
         valueDao = new DaoObjectValue(dao.getId(), field, type.getId());
         root.getDb().create(valueDao);
       }
       valueDao.setType(type.getId());
-
-      if (type == PogoType.STRING) {
-        valueDao.setString((String) value);
-      } else if (type == PogoType.INTEGER) {
-        valueDao.setInteger((Integer) value);
-      } else if (type == PogoType.NULL) {
-        // no value to set when null
-      } else if (type == PogoType.OBJECT) {
-        DaoObject newObject = new DaoObject();
-        root.getDb().create(newObject);
-        valueDao.setInteger(newObject.getId());
-      } else {
-        throw new AssertionError();
-      }
+      setValueDao(value, type, valueDao);
+      
       root.getDb().update(valueDao);
     } catch (SQLException e) {
       throw new PogoException(e);
+    }
+  }
+
+  private void setValueDao(Object value, PogoType type, DaoObjectValue valueDao) throws SQLException, AssertionError {
+    if (type == PogoType.STRING) {
+      valueDao.setString((String) value);
+      
+    } else if (type == PogoType.INTEGER) {
+      valueDao.setInteger((Integer) value);
+      
+    } else if (type == PogoType.NULL) {
+      // no value to set when null
+      
+    } else if (type == PogoType.OBJECT) {
+      DaoObject newObject = new DaoObject();
+      root.getDb().create(newObject);
+      valueDao.setInteger(newObject.getId());
+      
+    } else if (type == PogoType.LIST) {
+      DaoList newList = new DaoList();
+      root.getDb().create(newList);
+      valueDao.setInteger(newList.getId());
+      
+    } else {
+      throw new AssertionError();
     }
   }
 
@@ -79,6 +94,10 @@ public class HopsPogoObject implements PogoObject {
         } else if (type == PogoType.OBJECT) {
           DaoObject childObject = root.getDb().select(DaoObject.class).byPk(value.getInteger()).first();
           return new HopsPogoObject(root, childObject);
+          
+        } else if (type == PogoType.LIST) {
+          DaoList childList = root.getDb().select(DaoList.class).byPk(value.getInteger()).first();
+          return new HopsPogoList(root, childList);
         }
       } catch (NoMatchFound e) {
         throw new NoSuchField(field);
