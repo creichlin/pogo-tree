@@ -42,36 +42,11 @@ public class HopsPogoObject implements PogoObject {
         root.getDb().create(valueDao);
       }
       valueDao.setType(type.getId());
-      setValueDao(value, type, valueDao);
+      AccessUtils.setValueDao(root, value, type, valueDao);
       
       root.getDb().update(valueDao);
     } catch (SQLException e) {
       throw new PogoException(e);
-    }
-  }
-
-  private void setValueDao(Object value, PogoType type, DaoObjectValue valueDao) throws SQLException, AssertionError {
-    if (type == PogoType.STRING) {
-      valueDao.setString((String) value);
-      
-    } else if (type == PogoType.INTEGER) {
-      valueDao.setInteger((Integer) value);
-      
-    } else if (type == PogoType.NULL) {
-      // no value to set when null
-      
-    } else if (type == PogoType.OBJECT) {
-      DaoObject newObject = new DaoObject();
-      root.getDb().create(newObject);
-      valueDao.setInteger(newObject.getId());
-      
-    } else if (type == PogoType.LIST) {
-      DaoList newList = new DaoList();
-      root.getDb().create(newList);
-      valueDao.setInteger(newList.getId());
-      
-    } else {
-      throw new AssertionError();
     }
   }
 
