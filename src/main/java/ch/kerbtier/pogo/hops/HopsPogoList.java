@@ -26,8 +26,8 @@ public class HopsPogoList implements PogoList {
     List<DaoListValue> values = getValues();
     DaoListValue newValue = new DaoListValue(dao.getId(), values.size(), type.getId());
     try {
-      root.getDb().create(newValue);
       AccessUtils.setValueDao(root, value, type, newValue);
+      root.getDb().create(newValue);
       values.add(newValue);
     } catch (SQLException e) {
       throw new PogoException(e);
@@ -36,8 +36,17 @@ public class HopsPogoList implements PogoList {
 
   @Override
   public Object get(int index) {
-
-    return null;
+    DaoListValue value = getValues().get(index);
+    PogoType type = PogoType.byId(value.getId());
+    
+    if(type == PogoType.STRING) {
+      return value.getString();
+    } else if(type == PogoType.INTEGER) {
+      return value.getInteger();
+    } else {
+      throw new AssertionError();
+    }
+    
   }
 
   @Override
@@ -65,7 +74,6 @@ public class HopsPogoList implements PogoList {
     if (values_ == null) {
       try {
         values_ = root.getDb().select(DaoListValue.class).where("parent = ?", dao.getId()).orderBy("index").listAll();
-        System.out.println(values_);
       } catch (SQLException e) {
         throw new PogoException(e);
       }
@@ -77,6 +85,10 @@ public class HopsPogoList implements PogoList {
 
   public void leftShift(Object value) {
     add(value);
+  }
+
+  public Object getAt(int index) {
+    return get(index);
   }
 
 }

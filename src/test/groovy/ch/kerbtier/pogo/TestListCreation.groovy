@@ -56,4 +56,16 @@ public class TestListCreation extends H2Test {
     }
   }
 
+  @Test
+  public void testAddPrimitiveWithTransaction() {
+    transaction {
+      pogo["field"] = PogoList.class
+      pogo["field"] << "FOO"
+    }
+    
+    transaction {
+      assert pogo["field"][0] == "FOO"
+    }
+  }
+
 }
