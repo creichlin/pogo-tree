@@ -100,7 +100,6 @@ public class HopsPogoObject implements PogoObject {
     } catch (SQLException e) {
       throw new PogoException(e);
     }
-
   }
 
   @Override
@@ -122,10 +121,22 @@ public class HopsPogoObject implements PogoObject {
           DaoObject object = root.getDb().select(DaoObject.class).byPk(value.getInteger()).first();
           root.getDb().delete(object);
           root.getDb().delete(value);
+
+        } else if (type == PogoType.LIST) {
+          HopsPogoList subList = get(field, HopsPogoList.class);
+
+          while (subList.size() > 0) {
+            subList.delete(subList.size() - 1);
+          }
+          DaoList object = root.getDb().select(DaoList.class).byPk(value.getInteger()).first();
+          root.getDb().delete(object);
+          root.getDb().delete(value);
+        
+        } else {
+          throw new AssertionError();
         }
       } catch (NoMatchFound e) {
-        // there is no value so we wont delete
-        return;
+        throw new AssertionError();
       }
     } catch (SQLException e) {
       throw new PogoException(e);

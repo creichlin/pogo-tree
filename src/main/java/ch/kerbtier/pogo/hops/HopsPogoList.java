@@ -8,6 +8,8 @@ import ch.kerbtier.pogo.PogoType;
 import ch.kerbtier.pogo.exceptions.PogoException;
 import ch.kerbtier.pogo.hops.dao.DaoList;
 import ch.kerbtier.pogo.hops.dao.DaoListValue;
+import ch.kerbtier.pogo.hops.dao.DaoObject;
+import ch.kerbtier.pogo.hops.dao.DaoObjectValue;
 
 public class HopsPogoList implements PogoList {
 
@@ -38,15 +40,15 @@ public class HopsPogoList implements PogoList {
   public Object get(int index) {
     DaoListValue value = getValues().get(index);
     PogoType type = PogoType.byId(value.getId());
-    
-    if(type == PogoType.STRING) {
+
+    if (type == PogoType.STRING) {
       return value.getString();
-    } else if(type == PogoType.INTEGER) {
+    } else if (type == PogoType.INTEGER) {
       return value.getInteger();
     } else {
       throw new AssertionError();
     }
-    
+
   }
 
   @Override
@@ -57,12 +59,32 @@ public class HopsPogoList implements PogoList {
 
   @Override
   public void delete(int index) {
+    if (index == size() - 1) {
+      // delete last index
+      try {
+        root.getDb().delete(getValues().get(index));
+        getValues().remove(index);
+      } catch (SQLException e) {
+        throw new PogoException(e);
+      }
+    } else {
+      throw new AssertionError();
+    }
 
   }
 
   @Override
   public void delete() {
+    try {
+      DaoObjectValue fieldDao = root.getDb().select(DaoObjectValue.class)
+          .where("integer = ? AND type = ?", dao.getId(), PogoType.LIST.getId()).first();
 
+      DaoObject parentObject = root.getDb().select(DaoObject.class).byPk(fieldDao.getParent()).first();
+
+      new HopsPogoObject(root, parentObject).delete(fieldDao.getName());
+    } catch (SQLException e) {
+      throw new PogoException(e);
+    }
   }
 
   @Override
