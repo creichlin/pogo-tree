@@ -45,6 +45,7 @@ public class HopsPogoObject implements PogoObject {
       AccessUtils.setValueDao(root, value, type, valueDao);
       
       root.getDb().update(valueDao);
+      
     } catch (SQLException e) {
       throw new PogoException(e);
     }
@@ -133,10 +134,10 @@ public class HopsPogoObject implements PogoObject {
           root.getDb().delete(value);
         
         } else {
-          throw new AssertionError();
+          throw new AssertionError("unknown type " + type);
         }
       } catch (NoMatchFound e) {
-        throw new AssertionError();
+        throw new AssertionError(e);
       }
     } catch (SQLException e) {
       throw new PogoException(e);

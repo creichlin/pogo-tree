@@ -18,6 +18,7 @@ public class HopsPogoFactory implements PogoFactory {
 
   private String driver;
   private String url;
+  private boolean printStatements;
   
   
   public HopsPogoFactory(String driver, String url) {
@@ -35,6 +36,7 @@ public class HopsPogoFactory implements PogoFactory {
       Class.forName(driver);
       
       db = new Db(url, new AnnotationModelProvider());
+      db.setPrintStatements(printStatements);
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
@@ -68,13 +70,12 @@ public class HopsPogoFactory implements PogoFactory {
       return new HopsPogo(db, rootDao);
     } catch (SQLException e) {
       db.rollback();
-      try {
-        System.out.println("Available tables: " + db.getTableNames());
-      } catch (SQLException e1) {
-        e1.printStackTrace();
-      }
       throw new RuntimeException(e);
     }
+  }
+  
+  public void setPrintStatements(boolean printStatements) {
+    this.printStatements = printStatements;
   }
 
 }
