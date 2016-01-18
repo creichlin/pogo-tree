@@ -3,6 +3,7 @@ package ch.kerbtier.pogo.hops;
 import java.sql.SQLException;
 import java.util.List;
 
+import ch.kerbtier.hopsdb.DbPs;
 import ch.kerbtier.pogo.PogoList;
 import ch.kerbtier.pogo.PogoType;
 import ch.kerbtier.pogo.exceptions.PogoException;
@@ -39,8 +40,8 @@ public class HopsPogoList implements PogoList {
   @Override
   public Object get(int index) {
     DaoListValue value = getValues().get(index);
-    PogoType type = PogoType.byId(value.getId());
-
+    PogoType type = PogoType.byId(value.getType());
+    
     if (type == PogoType.STRING) {
       return value.getString();
     } else if (type == PogoType.INTEGER) {
@@ -51,26 +52,28 @@ public class HopsPogoList implements PogoList {
 
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <X> X get(int index, Class<X> type) {
-
-    return null;
+    return (X)get(index);
   }
 
   @Override
   public void delete(int index) {
-    if (index == size() - 1) {
-      // delete last index
       try {
+        int size = size();
         root.getDb().delete(getValues().get(index));
         getValues().remove(index);
+        
+        if(index < size - 1) {
+          DbPs update = root.getDb().prepareStatement("update listvalue set index = index - 1 where parent = ? and index > ?");
+          update.setParameter(1, dao.getId());
+          update.setParameter(2, index);
+          update.executeUpdate();
+        }
       } catch (SQLException e) {
         throw new PogoException(e);
       }
-    } else {
-      throw new AssertionError();
-    }
-
   }
 
   @Override

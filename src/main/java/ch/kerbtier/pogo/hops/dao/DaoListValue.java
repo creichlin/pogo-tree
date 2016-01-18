@@ -26,4 +26,8 @@ public class DaoListValue extends DaoValue {
   public void setIndex(int index) {
     this.index = index;
   }
+  
+  public String toString() {
+    return "<element#" + getId() + "@" + index + " type:" + getType() + ">";
+  }
 }

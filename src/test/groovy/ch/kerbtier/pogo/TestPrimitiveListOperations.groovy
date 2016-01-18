@@ -68,6 +68,54 @@ public class TestPrimitiveListOperations extends H2Test {
     }
   }
 
+  @Test
+  public void deleteLastElement() {
+    transaction {
+      pogo["field"] = PogoList.class
+      pogo["field"] << "FOO"
+      pogo["field"] << "BAR"
+      pogo["field"] << "LA"
+
+      pogo['field'].delete(2)
+      
+      assert pogo["field"].size() == 2
+      assert pogo["field"][0] == "FOO"
+      assert pogo["field"][1] == "BAR"
+    }
+  }
+
+  @Test
+  public void deleteFirstElement() {
+    transaction {
+      pogo["field"] = PogoList.class
+      pogo["field"] << "FOO"
+      pogo["field"] << "BAR"
+      pogo["field"] << "LA"
+
+      pogo['field'].delete(0)
+      
+      assert pogo["field"].size() == 2
+      assert pogo["field"][0] == "BAR"
+      assert pogo["field"][1] == "LA"
+    }
+  }
+
+  @Test
+  public void deleteMiddleElement() {
+    transaction {
+      pogo["field"] = PogoList.class
+      pogo["field"] << "FOO"
+      pogo["field"] << "BAR"
+      pogo["field"] << "LA"
+
+      pogo['field'].delete(1)
+      
+      assert pogo["field"].size() == 2
+      assert pogo["field"][0] == "FOO"
+      assert pogo["field"][1] == "LA"
+    }
+  }
+
   @Test(expected = NoSuchField.class)
   public void deleteList() {
     transaction {
