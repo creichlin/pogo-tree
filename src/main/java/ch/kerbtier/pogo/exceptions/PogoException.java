@@ -1,10 +1,8 @@
 package ch.kerbtier.pogo.exceptions;
 
-import java.sql.SQLException;
-
 public class PogoException extends RuntimeException {
 
-  public PogoException(SQLException e) {
+  public PogoException(Exception e) {
     super(e);
   }
 

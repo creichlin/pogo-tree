@@ -54,34 +54,15 @@ public class HopsPogoObject implements PogoObject {
   @Override
   public Object get(String field) {
     try {
-      try {
-        DaoObjectValue value = root.getDb().select(DaoObjectValue.class)
-            .where("parent = ? and name = ?", dao.getId(), field).first();
-        PogoType type = PogoType.byId(value.getType());
-        if (type == PogoType.STRING) {
-          return value.getString();
-
-        } else if (type == PogoType.INTEGER) {
-          return value.getInteger();
-
-        } else if (type == PogoType.NULL) {
-          return null;
-
-        } else if (type == PogoType.OBJECT) {
-          DaoObject childObject = root.getDb().select(DaoObject.class).byPk(value.getInteger()).first();
-          return new HopsPogoObject(root, childObject);
-          
-        } else if (type == PogoType.LIST) {
-          DaoList childList = root.getDb().select(DaoList.class).byPk(value.getInteger()).first();
-          return new HopsPogoList(root, childList);
-        }
-      } catch (NoMatchFound e) {
-        throw new NoSuchField(field);
-      }
+      DaoObjectValue value = root.getDb().select(DaoObjectValue.class)
+          .where("parent = ? and name = ?", dao.getId(), field).first();
+      return AccessUtils.readValue(root, value);
+      
+    } catch (NoMatchFound e) {
+      throw new NoSuchField(field);
     } catch (SQLException e) {
       throw new PogoException(e);
     }
-    throw new AssertionError();
   }
 
   @Override

@@ -11,6 +11,7 @@ import ch.kerbtier.pogo.hops.dao.DaoList;
 import ch.kerbtier.pogo.hops.dao.DaoListValue;
 import ch.kerbtier.pogo.hops.dao.DaoObject;
 import ch.kerbtier.pogo.hops.dao.DaoObjectValue;
+import ch.kerbtier.pogo.hops.dao.DaoValue;
 
 public class HopsPogoList implements PogoList {
 
@@ -39,17 +40,12 @@ public class HopsPogoList implements PogoList {
 
   @Override
   public Object get(int index) {
-    DaoListValue value = getValues().get(index);
-    PogoType type = PogoType.byId(value.getType());
-    
-    if (type == PogoType.STRING) {
-      return value.getString();
-    } else if (type == PogoType.INTEGER) {
-      return value.getInteger();
-    } else {
-      throw new AssertionError();
+    DaoValue value = getValues().get(index);
+    try {
+      return AccessUtils.readValue(root, value);
+    } catch (SQLException e) {
+      throw new PogoException(e);
     }
-
   }
 
   @SuppressWarnings("unchecked")
