@@ -65,6 +65,7 @@ public class HopsPogoObject implements PogoObject {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <X> X get(String field, Class<X> type) {
     return (X) get(field);
