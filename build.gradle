@@ -14,7 +14,6 @@ apply from: 'kerbtier-defaults.gradle'
 dependencies {
   compile 'ch.kerbtier.hops-db:hops-db:0.1.+'
   
-  testCompile 'com.h2database:h2:1.4.190'
   testCompile 'junit:junit:4.12'
   testCompile 'com.mchange:c3p0:0.9.5.1'
   testCompile 'org.codehaus.groovy:groovy-all:2.4.5'
